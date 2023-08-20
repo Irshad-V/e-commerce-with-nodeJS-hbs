@@ -1,0 +1,158 @@
+<section>
+
+    <div class="container">
+
+
+        <p id="mm">{{user}}</p>
+
+        <table class="table mt-5">
+            <thead>
+                <tr>
+                    <th class="col">Item</th>
+                    <th class="col">Title</th>
+                    <th class="col">Quantity</th>
+                    <th class="col">price</th>
+                    <th class="col">remove from cart </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {{#each product}}
+                <tr id="cartItem">
+                    <td><img src="/images/{{this.product.image}}" alt="" style="width:70px;height:70px"> </td>
+                    <td> {{this.product.Productname}} </td>
+
+                    <td> <button class="cart-item-count " style="margin-right: 5px;"
+                            onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1,'{{../user._id}}')">-</button>
+
+                        <span id="{{this.product._id}}"> {{this.quantity}} </span>
+
+                        <button class="cart-item-count" style="margin-left: 15px;"
+                            onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1,'{{../user._id}}')">+</button>
+                    </td>
+                    <td> {{this.product.price}} </td>
+                    <td>
+                        <button href="" class="btn btn-danger"
+                            onclick="removeCartItem('{{this._id}}','{{this.product._id}}',)">remove</button>
+
+                    </td>
+
+                </tr>
+
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div class=" pr-5">
+
+            {{#if TotalPrice}}
+            <h5 class="mt-5 mr-5">Total :Rs <span id="total">{{TotalPrice}}</span></h5> <br>
+            <a href="/place-order" id="place-order-btn" class="btn btn-success mt-3" style="width: 100%;"> <b>Place
+                    Order</b> </a>
+
+            {{else}}
+            <h5 class="mt-5 mr-5">Total :Rs <span id="total">00</span></h5> <br>
+            <a href="/" class="btn btn-success mt-3" style="width: 100%;"> <b>Add Product to Cart</b> </a>
+
+            {{> user-header}}
+
+            {{/if}}
+
+        </div>
+
+
+
+    </div>
+
+
+</section>
+<script>
+
+    function changeQuantity(cartId, proId, counts, user) {
+        let quantity = parseInt(document.getElementById(proId).innerHTML)
+
+        console.log(user)
+        console.log(quantity)
+        const count = parseInt(counts)
+        const dataToSend = {
+            cartId,
+            proId,
+            count,
+            quantity,
+            user
+        };
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // S
+            },
+            body: JSON.stringify(dataToSend) // Convert the data to a JSON string before sending
+        };
+
+        fetch("/change-product-quantity", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.quantityChange.removedProduct) {
+
+                    document.getElementById("cartItem").remove()
+
+                } else {
+                    document.getElementById(proId).innerHTML = quantity + count
+
+                    document.getElementById("total").innerHTML = data.TotalPrice
+
+                }
+
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+
+    }
+
+
+    function removeCartItem(cartId, proId) {
+
+        const requestData = {
+            cartId,
+            proId,
+        };
+        const change = {
+
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify(requestData)
+
+
+        }
+
+
+        fetch("/cart-product-remove", change)
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.removeItem.removedProduct) {
+                    console.log("item delted")
+
+                    document.getElementById("cartItem").remove()
+                    document.getElementById("total").innerHTML = 00
+                    document.getElementById("place-order-btn").href = "/";
+                    document.getElementById("place-order-btn").innerHTML = "Add Product to Cart";
+
+                }
+
+
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+
+    }
+</script>

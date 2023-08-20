@@ -1,0 +1,53 @@
+<section>
+
+    <div class="container">
+        <table class="table mt-5">
+            {{#if orders}}
+            <thead>
+                <tr>
+                    <th class="col">Date</th>
+                    <th class="col">Address</th>
+                    <th class="col">pincode</th>
+                    <th class="col">Amount</th>
+                    <th class="col">payment </th>
+                    <th class="col">status </th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+
+
+                {{#each orders}}
+                <tr id="cartItem">
+                    <td>{{this.Orderd_Date}} </td>
+                    <td> {{this.deliveryDeatails.address}} </td>
+
+                    <td> {{this.deliveryDeatails.pincode}} </td>
+                    <td>{{this.total}} </td>
+                    <td>{{this.Payment_mode}} </td>
+                    <td> {{this.status}} </td>
+
+
+
+                    {{/each}}
+            </tbody>
+
+
+            {{else}}
+
+            <h2 class="text-danger text-center mt-5">Still No Orders PLaced</h2>
+            <a href="/cart" class="btn btn-success mt-3" style="width: 100%;"> <b>place an Order</b> </a>
+
+
+
+
+            {{/if}}
+        </table>
+
+
+
+    </div>
+
+
+</section>

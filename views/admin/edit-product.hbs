@@ -1,0 +1,57 @@
+<section>
+    <div class="container ">
+        <div class="row m-auto d-flex justify-content-center">
+            <div class="col-md-6  ">
+                <h2 class="text-center">Edit Product</h2>
+                <form method="Post" action="/admin/edit/{{products._id}}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Product Name</label>
+                        <input type="text" class="form-control" value="{{products.Productname}}" id="name" name="name"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <input type="text" class="form-control" value="{{products.category}}" id="category"
+                            name="category" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" class="form-control" value="{{products.price}}" id="price" name="price"
+                            step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description"
+                            required> {{products.description}} </textarea>
+                    </div>
+                    <div class="from-group">
+                        <img style="width: 150px;height:150px m-auto" id="firstImg" src="/images/{{products.image}}"
+                            alt="">
+                    </div>
+                    <div class="form-group">
+
+                        <input type="text" class="form-control" style="visibility: hidden;" value="{{products.image}}"
+                            id="image" name="image">
+
+                        <label for="image">Image</label>
+                        <input type="file" class="form-control-file mt-2 mb-2" id="imageInput"
+                            onchange="ChangeImg(event)" name="image">
+                    </div>
+                    <button type="submit" class="btn btn-primary ml-auto mt-2 ">Add Product</button>
+                    <a href="/admin" class="btn btn-secondary ml-auto mt-2 ">Admin Page</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    function ChangeImg(e) {
+        console.log(e)
+
+        document.getElementById("firstImg").src = URL.createObjectURL(e.target.files[0])
+
+    }
+
+</script>

@@ -1,0 +1,50 @@
+<section>
+    <div class="container mt-5">
+        <div class="row">
+            {{#each products}}
+            <div class="col-md-3 p-3">
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" style="height: 300px; width:300px" src="/images/{{this.image}}"
+                        alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.productname}}</h5>
+                        <p class="card-text">{{this.description}}</p>
+                        <p class="card-text">{{this.price}}</p>
+
+                        <button onclick="addToCart('{{this._id}}')" class="btn btn-primary">
+                            add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>
+
+<script>
+
+    function addToCart(id) {
+        fetch(`/add-to-cart/${id}`)
+            .then((response) => {
+                 return response.json()
+            })
+            .then((data) => {
+                // Process the JSON data retrieved from the server
+                if (data) {
+                    let cart = document.getElementById("cart").innerText
+                    
+                    const CartCount = parseInt(data.CartCount)
+                    document.getElementById("cart").innerText = CartCount
+                }
+
+              
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+
+    }
+</script>
+

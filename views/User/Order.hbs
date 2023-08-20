@@ -1,0 +1,211 @@
+<div class="container">
+    <session>
+        <form id="checkout-form" class="d-sm-flex justify-content-between p-5" action="">
+
+            <div class="container mt-5 ">
+                <h3 id="Delivery" class=" text-danger mb-4" hidden> Please Fill this form!!! </h3>
+
+                <h2>Enter Delivery Address</h2>
+                <div class="form-group row mt-3">
+                    <label for="address" class="col-sm-2 col-form-label">Address</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="address" required>
+                    </div>
+                </div>
+                <div class="form-group row mt-4 ">
+                    <label for="pincode" class="col-sm-2 col-form-label">pincode</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" id="pincode" required>
+                    </div>
+                </div>
+                <div class="form-group row mt-4 ">
+                    <label for="phone" class="col-sm-2 col-form-label">phone</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" id="phone" value="" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container mt-5 border border-secondary ">
+
+                <h5 class="mt-2 mb-3">Total Amount : Rs {{#if TotalPrice}} {{TotalPrice}} {{else}} 00 {{/if}}</h5>
+
+                <p class="mt-2 mb-2`">payment mode</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="payment-method" id="exampleRadios1" value="COD"
+                        checked>
+                    <label class="form-check-label" for="exampleRadios1">
+                        COD
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="payment-method" id="exampleRadios2"
+                        value="ONLINE">
+                    <label class="form-check-label" for="exampleRadios2">
+                        Online
+                    </label>
+                </div>
+                <input type="text" name="userId" id="userId" value="{{user._id}}" hidden required>
+                <button type="submit" id="Form-submit" class="btn btn-primary mt-3 mb-2">CheckOut</button>
+            </div>
+
+        </form>
+
+
+    </session>
+
+</div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+    document.getElementById("Form-submit").addEventListener("click", function (event) {
+
+        event.preventDefault()
+
+        const addres = document.getElementById("address").value
+        const pincode = parseInt(document.getElementById("pincode").value)
+        const phone = parseInt(document.getElementById("phone").value)
+        const method = document.querySelector('input[name="payment-method"]:checked').value;
+        const userId = document.getElementById("userId").value
+
+
+
+        let dataToSend = {
+            addres,
+            pincode,
+            phone,
+            method,
+            userId
+        };
+
+
+
+        let requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // S
+            },
+            body: JSON.stringify(dataToSend) // Convert the data to a JSON string before sending
+        };
+
+
+
+        if ((!phone || address === "" || !pincode)) {
+            document.getElementById("Delivery").removeAttribute('hidden')
+            setTimeout(function () {
+                document.getElementById("Delivery").innerText = ""
+                location.reload()
+            }, 2000);
+
+
+        } else {
+            fetch("/place-order", requestOptions)
+                .then(response => response.json())
+                .then(response => {
+
+
+                    console.log(response)
+
+
+
+                    if (response.Cod_success) {
+
+                        console.log(response)
+
+                        location.href = "/order_succes";
+
+                    } else {
+                        razorPayment(response)
+
+
+
+                    }
+
+                })
+
+        }
+
+
+        function razorPayment(order) {
+
+            var options = {
+                "key": "rzp_test_vs7bYwLImHAmcd", // Enter the Key ID generated from the Dashboard
+                "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "INR",
+                "name": "Acme Corp", //your business name
+                "description": "Test Transaction",
+                "image": "https://example.com/your_logo",
+                "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                "handler": function (response) {
+
+
+                    console.log("payment success")
+                    verifyPayment(response, order)
+                },
+                "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                    "name": "Gaurav Kumar", //your customer's name
+                    "email": "gaurav.kumar@example.com",
+                    "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+
+
+
+
+            var rzp1 = new Razorpay(options);
+
+            rzp1.on('payment.failed', function (response) {
+                conole.log("paymet error occured")
+                conole.error(response)
+
+            });
+
+            rzp1.open();
+
+
+
+        };
+
+        function verifyPayment(payment, order) {
+
+
+            fetch('/verfy-payment', {
+
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Specify the content type as JSON
+                },
+                body: JSON.stringify({ order, payment }) // Convert the data object to a JSON string
+
+            }).then((res) => res.json())
+                .then((res) => {
+                    if (res.status) {
+                        location.href = "/order_succes";
+
+                    } else {
+                        alert("payment failed")
+                    }
+
+
+                })
+
+
+        }
+
+
+
+    });
+
+
+
+
+
+
+</script>
